@@ -3,6 +3,7 @@ name = "netpulse"
 version = "0.1.0"
 description = "CLI benchmark tool for measuring download speed"
 readme = "README.md"
+license = { file = "LICENSE" }
 authors = [
     { name = "shalbuz", email = "shalbuz.mursalov@gmail.com" }
 ]
