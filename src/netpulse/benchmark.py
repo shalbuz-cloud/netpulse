@@ -68,6 +68,7 @@ def run_benchmark(
         url: The target URL to benchmark.
         config: Application configuration values.
         console: Rich console used to render the progress bar.
+        transport: Optional httpx transport for dependency injection (e.g., MockTransport in tests).
 
     Returns:
         BenchmarkResult with aggregated metrics and any errors encountered.
@@ -135,7 +136,7 @@ def run_benchmark(
                 result.errors.append(msg)
                 progress.update(
                     task_id,
-                    description=(f"Request {i}/{config.total_requests}: ERROR ({elapsed:.3f}s)"),
+                    description=f"Request {i}/{config.total_requests}: ERROR ({elapsed:.3f}s)",
                     advance=1,
                 )
     return result
@@ -166,3 +167,6 @@ def print_summary(result: BenchmarkResult, console: Console) -> None:
     table.add_row("Total bytes downloaded", format_size(result.total_bytes))
     table.add_row("Average downloaded speed", format_speed(result.avg_speed))
     console.print(table)
+
+
+__all__ = ["BenchmarkResult", "print_summary", "run_benchmark"]

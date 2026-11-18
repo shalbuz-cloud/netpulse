@@ -41,3 +41,6 @@ def format_speed(bytes_per_second: float) -> str:
     if bytes_per_second < _KIB:
         return f"{bytes_per_second:.2f} B/s"
     return f"{format_size(bytes_per_second)}/s"
+
+
+__all__ = ["format_size", "format_speed"]

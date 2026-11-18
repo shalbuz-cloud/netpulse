@@ -16,3 +16,6 @@ class Config:
     total_requests: int = field(default=10)
     request_timeout: float = field(default=30)
     user_agent: str = field(default="NetPulse-Benchmark/1.0")
+
+
+__all__ = ["Config"]
