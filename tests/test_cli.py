@@ -55,46 +55,38 @@ class TestMain:
         captured = capsys.readouterr()
         assert "URL scheme must be http:// or https://" in captured.out
 
-    def test_successful_run_calls_benchmark_and_prints_summary(self, capsys) -> None:
-        """Happy path: valid URL triggers benchmark and summary."""
-        mock_result = BenchmarkResult(
+
+@pytest.mark.parametrize(
+    "result",
+    [
+        BenchmarkResult(
             total_requests=3,
             success_count=3,
             total_time=1.5,
             total_bytes=3072,
-        )
-
-        with (
-            patch.object(sys, "argv", ["netpulse", "https://example.com/file"]),
-            patch("netpulse.run_benchmark", return_value=mock_result) as mock_bench,
-            patch("netpulse.print_summary") as mock_print,
-        ):
-            main()
-
-        mock_bench.assert_called_once()
-        # print_summary is called with (result, console)
-        mock_print.assert_called_once()
-        args, _ = mock_print.call_args
-        assert args[0] == mock_result
-
-    def test_benchmark_errors_are_captured(self, capsys) -> None:
-        """Errors from benchmark are passed to print_summary."""
-        mock_result = BenchmarkResult(
+        ),
+        BenchmarkResult(
             total_requests=3,
             success_count=1,
             total_time=0.5,
             total_bytes=1024,
             errors=["Request 2/3: 500 Internal Server Error"],
-        )
+        ),
+    ],
+)
+def test_main_delegates_to_benchmark_and_summary(result: BenchmarkResult) -> None:
+    """main() orchestrates run_benchmark and print_summary correctly.
 
-        with (
-            patch.object(sys, "argv", ["netpulse", "https://example.com/file"]),
-            patch("netpulse.run_benchmark", return_value=mock_result) as mock_bench,
-            patch("netpulse.print_summary") as mock_print,
-        ):
-            main()
+    Both successful and error-containing results are passed through.
+    """
+    with (
+        patch.object(sys, "argv", ["netpulse", "https://example.com/file"]),
+        patch("netpulse.run_benchmark", return_value=result) as mock_bench,
+        patch("netpulse.print_summary") as mock_print,
+    ):
+        main()
 
-        mock_bench.assert_called_once()
-        mock_print.assert_called_once()
-        args, _ = mock_print.call_args
-        assert args[0] == mock_result
+    mock_bench.assert_called_once()
+    mock_print.assert_called_once()
+    args, _ = mock_print.call_args
+    assert args[0] == result
