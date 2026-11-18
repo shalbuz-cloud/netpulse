@@ -56,6 +56,7 @@ def run_benchmark(
     url: str,
     config: Config,
     console: Console,
+    transport: httpx.BaseTransport | None = None,
 ) -> BenchmarkResult:
     """Execute sequential HTTP GET requests and collect performance metrics.
 
@@ -101,6 +102,7 @@ def run_benchmark(
             limits=httpx.Limits(max_connections=1, max_keepalive_connections=1),
             timeout=httpx.Timeout(config.request_timeout),
             follow_redirects=True,
+            transport=transport,
         ) as client,
     ):
         for i in range(1, config.total_requests + 1):
